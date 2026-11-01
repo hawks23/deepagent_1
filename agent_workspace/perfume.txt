@@ -1,0 +1,25 @@
+Perfume Note Extraction
+========================
+
+Name of perfume: Le Male Le Parfum
+Brand: Jean Paul Gaultier
+Year: 2020
+Concentration: Eau de Parfum (EDP)
+Audience: Men
+Family: Oriental spicy
+
+Note pyramid (as classified by the perfume-finder MCP server / 10ML Fragrance Index):
+
+Top notes:
+- Cardamom
+
+Heart (middle) notes:
+- Lavender
+- Iris
+
+Base notes:
+- Vanilla
+- Woody notes
+
+Source:
+- https://10ml.com/search?q=Jean%20Paul%20Gaultier%20Le%20Male%20Le%20Parfum

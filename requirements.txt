@@ -1,0 +1,8 @@
+dotenv
+deepagents
+requests
+tavily-python
+langchain-ollama
+langchain-openai
+langchain[mcp]
+fastmcp

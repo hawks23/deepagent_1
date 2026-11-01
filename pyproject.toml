@@ -1,0 +1,26 @@
+[project]
+name = "deep-agents-lang"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Amalendu", email = "amalendup23@gmail.com" }
+]
+requires-python = ">=3.13"
+dependencies = [
+    "deepagents>=0.7.32",
+    "dotenv>=0.9.9",
+    "fastmcp>=4.1.4",
+    "langchain-ollama>=1.1.0",
+    "langchain-openai>=1.7.3",
+    "langchain[mcp]>=1.4.7",
+    "requests>=2.34.2",
+    "tavily-python>=0.8.5",
+]
+
+[project.scripts]
+deep-agents-lang = "deep_agents_lang:main"
+
+[build-system]
+requires = ["uv_build>=0.13.5,<0.14.0"]
+build-backend = "uv_build"
