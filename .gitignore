@@ -12,3 +12,7 @@ wheels/
 # Local conversation data
 chat_history.json
 chat_history.json.tmp
+
+.env
+.env.*
+!.env.example
