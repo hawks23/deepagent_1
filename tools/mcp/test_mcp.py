@@ -6,8 +6,8 @@ from langchain.mcp import MCPAdapter
 
 # Add each server here using a unique name. Names prefix its tools.
 MCP_SERVERS = {
-    "langchain_docs": {"url": "https://docs.langchain.com/mcp"},
-    "fastmcp_docs": {"url": "https://gofastmcp.com/mcp"},
+    # "langchain_docs": {"url": "https://docs.langchain.com/mcp"},
+    # "fastmcp_docs": {"url": "https://gofastmcp.com/mcp"},
     "perfume-finder": {"url": "https://mcp.10ml.com/mcp"}
 }
 

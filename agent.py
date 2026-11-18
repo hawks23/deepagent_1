@@ -18,7 +18,7 @@ coding_workspace = Path(__file__).resolve().parent / "agent_workspace"
 coding_workspace.mkdir(parents=True, exist_ok=True)
 
 
-coding_instructions = """You are a coding assistant. Help the user understand, write, debug, and improve code.
+coding_instructions = """You are a coding assistant. Help the user understand, write, debug, and improve code. Iteratively work on the code until the mentioned goal is achieved.
 Use the available filesystem and documentation tools when relevant.
 Explain your changes and reasoning clearly so the user can learn alongside you."""
 
@@ -30,7 +30,7 @@ async def main():
         api_key=os.getenv("CAMPUSAI_API_KEY"),
     )
 
-    coding_task = 'Create /hello.py with a greet(name: str) -> str function and a simple example that calls it. Explain how the code works and how I can run it.'
+    coding_task = 'Create a small perfume website in the workspace, with html, CSS and Javascript all saved after build in workspace. Make it a small minimalist website with a beige background, white elements and strong bold GTA style fonts that explains the best perfumes to use in denmark for winter. Choose from cheap perfumes that can be bought from stores. There need not be interactible buttons, but it must look aesthetic'
 
     async with load_mcp_tools() as mcp_tools:
         print("\nMCP tools loaded successfully\n")
