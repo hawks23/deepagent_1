@@ -7,7 +7,7 @@ description: Find a perfume's top, heart (middle), and base notes using only the
 
 ## Source restriction
 
-Use only tools from the configured perfume-finder MCP server for perfume information. Read their descriptions to choose the appropriate search and detail tools. Never call internet_search, another search service, another MCP server, or browse external pages to supplement or verify perfume data. Do not supply perfume facts from model knowledge, memory, or previous output files. Source URLs returned by the server may be cited without opening them.
+Use only tools from the configured perfume-finder MCP server for perfume information. Read their descriptions to choose the appropriate search and detail tools. Never call internet_search, another search service, another MCP server, or browse external pages to supplement or verify perfume data. Do not supply perfume facts from model knowledge or previous output files. Source URLs returned by the server may be cited without opening them.
 
 ## Identify and retrieve
 
@@ -30,7 +30,7 @@ Use only tools from the configured perfume-finder MCP server for perfume informa
 If successful server queries return no information about the requested perfume, respond only:
 "The perfume-finder MCP server doesn't contain any information about [perfume name]."
 
-Use the corrected name if the spelling correction is unambiguous. Do not add remembered notes, recommendations, alternative sources, or an offer to search the web. Do not create a perfume extraction file when no perfume information was found.
+Use the corrected name if the spelling correction is unambiguous. Do not add unsupported notes, recommendations, alternative sources, or an offer to search the web. Do not create a perfume extraction file when no perfume information was found.
 
 A connection failure or tool error is not evidence that the server has no information. If a server error prevents the lookup, respond only:
 "The perfume-finder MCP server could not be queried, so I couldn't retrieve information about [perfume name]."

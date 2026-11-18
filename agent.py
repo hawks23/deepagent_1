@@ -1,57 +1,57 @@
+"""Coding agent using a local workspace and remote MCP tools."""
+import asyncio
 import os
-from langchain_openai import ChatOpenAI
-import openai
-from typing import Literal
-from langchain_ollama import ChatOllama
-from tavily import TavilyClient
-from deepagents import create_deep_agent
-from tools.web import internet_search
+from pathlib import Path
+
 from dotenv import load_dotenv
-load_dotenv()
+from langchain_openai import ChatOpenAI
+from deepagents import create_deep_agent
+from deepagents.backends import FilesystemBackend
 
-# System prompt to steer the agent to be an expert researcher
-research_instructions = """You are an expert researcher. Your job is to conduct thorough research and then write a polished report.
+from tools.mcp.test_mcp import load_mcp_tools
+from tools.web import internet_search
 
-You have access to an internet search tool as your primary means of gathering information.
+load_dotenv(Path(__file__).with_name(".env"))
 
-## `internet_search`
+# Local folder the agent will read from and write to.
+coding_workspace = Path(__file__).resolve().parent / "agent_workspace"
+coding_workspace.mkdir(parents=True, exist_ok=True)
 
-Use this to run an internet search for a given query. You can specify the max number of results to return, the topic, and whether raw content should be included.
-"""
+
+coding_instructions = """You are a coding assistant. Help the user understand, write, debug, and improve code.
+Use the available filesystem and documentation tools when relevant.
+Explain your changes and reasoning clearly so the user can learn alongside you."""
 
 
-## Initialize model
+async def main():
+    coding_model = ChatOpenAI(
+        base_url=os.getenv("CAMPUSAI_API_URL"),
+        model=os.getenv("CAMPUSAI_MODEL"),
+        api_key=os.getenv("CAMPUSAI_API_KEY"),
+    )
 
-from langchain_ollama import ChatOllama
+    coding_task = 'Create /hello.py with a greet(name: str) -> str function and a simple example that calls it. Explain how the code works and how I can run it.'
 
-# llm = ChatOllama(
-#     model="qwen3.5:9b",
-#     validate_model_on_init=True,
-#     temperature=0.8,
-#     num_predict=-1,
-#     reasoning=False
-#     # other params ...
-# )
+    async with load_mcp_tools() as mcp_tools:
+        print("\nMCP tools loaded successfully\n")
+        coding_agent = create_deep_agent(
+            model=coding_model,
+            tools=[internet_search, *mcp_tools],
+            system_prompt=coding_instructions,
+            backend=FilesystemBackend(
+                root_dir=coding_workspace,
+                virtual_mode=True,
+            ),
+            memory=["/agents.md"],
+            skills=["/skills/"],
+        )
 
-llm = ChatOpenAI(
-    base_url = os.getenv("CAMPUSAI_API_URL"),
-    model = os.getenv("CAMPUSAI_MODEL"),
-    api_key = os.getenv("CAMPUSAI_API_KEY")
-)
+        result = await coding_agent.ainvoke(
+            {"messages": [{"role": "user", "content": coding_task}]}
+        )
+        for message in result["messages"]:
+            message.pretty_print()
 
-agent = create_deep_agent(
-    model=llm,
-    tools=[internet_search],
-    system_prompt=research_instructions,
-    memory=["./AGENTS.md"],
-    skills=["./skills/"],
-)
 
-result = agent.invoke({"messages": [{"role": "user", "content": "What are the 3 most famous tourist spots in Denmark ??"}]})
-
-# Print the agent's response
-
-print("\nFull response:\n", result)
-
-print("\nOUTPUT\n")
-print(result["messages"][-1].content)
+if __name__ == "__main__":
+    asyncio.run(main())
