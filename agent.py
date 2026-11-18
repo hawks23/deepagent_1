@@ -30,8 +30,9 @@ async def main():
         api_key=os.getenv("CAMPUSAI_API_KEY"),
     )
 
-    coding_task = 'Create a small perfume website in the workspace, with html, CSS and Javascript all saved after build in workspace. Make it a small minimalist website with a beige background, white elements and strong bold GTA style fonts that explains the best perfumes to use in denmark for winter. Choose from cheap perfumes that can be bought from stores. There need not be interactible buttons, but it must look aesthetic'
-
+    # coding_task = 'Create a small perfume website in the workspace, with html, CSS and Javascript all saved after build in workspace. Make it a small minimalist website with a beige background, white elements and strong bold GTA style fonts that explains the best perfumes to use in denmark for winter. Choose from cheap perfumes that can be bought from stores. There need not be interactible buttons, but it must look aesthetic'
+    # coding_task = "Can you made all the contents we made for the perfume website into a directory called perfume_website in the same agent_workspace ?"
+    coding_task = "Replace the content of perfume.txt with only the information about YSL Elixer, about its notes, longevity and sillage"
     async with load_mcp_tools() as mcp_tools:
         print("\nMCP tools loaded successfully\n")
         coding_agent = create_deep_agent(
@@ -46,11 +47,17 @@ async def main():
             skills=["/skills/"],
         )
 
-        result = await coding_agent.ainvoke(
-            {"messages": [{"role": "user", "content": coding_task}]}
-        )
-        for message in result["messages"]:
-            message.pretty_print()
+        async for update in coding_agent.astream(
+            {"messages": [{"role": "user", "content": coding_task}]},
+            stream_mode="updates",
+        ):
+            for step, data in update.items():
+                if not isinstance(data, dict):
+                    continue
+
+                for message in data.get("messages", []):
+                    print(f"\n--- {step} ---", flush=True)
+                    message.pretty_print()
 
 
 if __name__ == "__main__":

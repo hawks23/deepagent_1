@@ -1,25 +1,11 @@
-Perfume Note Extraction
-========================
+Y Elixir by Yves Saint Laurent (YSL)
 
-Name of perfume: Le Male Le Parfum
-Brand: Jean Paul Gaultier
-Year: 2020
-Concentration: Eau de Parfum (EDP)
-Audience: Men
-Family: Oriental spicy
+Notes:
+- Top notes: bergamot, ginger, elemi, saffron
+- Heart (middle) notes: lavender, sage, juniper berry, geranium
+- Base notes: fir balsam, incense, cypriol, patchouli, oud
 
-Note pyramid (as classified by the perfume-finder MCP server / 10ML Fragrance Index):
+Longevity: 5/5 (excellent)
+Sillage (projection): 5/5 (excellent)
 
-Top notes:
-- Cardamom
-
-Heart (middle) notes:
-- Lavender
-- Iris
-
-Base notes:
-- Vanilla
-- Woody notes
-
-Source:
-- https://10ml.com/search?q=Jean%20Paul%20Gaultier%20Le%20Male%20Le%20Parfum
+Source: 10ML Fragrance Index — https://10ml.com/search?q=Yves%20Saint%20Laurent%20Y%20Elixir&utm_source=mcp&utm_medium=ai-assistant&utm_campaign=get_perfume
