@@ -6,7 +6,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
 from deepagents import create_deep_agent
-from deepagents.backends import FilesystemBackend
+from deepagents.backends import FilesystemBackend, CompositeBackend, StateBackend
 
 from tools.mcp.test_mcp import load_mcp_tools
 from tools.web import internet_search
@@ -32,19 +32,21 @@ async def main():
 
     # coding_task = 'Create a small perfume website in the workspace, with html, CSS and Javascript all saved after build in workspace. Make it a small minimalist website with a beige background, white elements and strong bold GTA style fonts that explains the best perfumes to use in denmark for winter. Choose from cheap perfumes that can be bought from stores. There need not be interactible buttons, but it must look aesthetic'
     # coding_task = "Can you made all the contents we made for the perfume website into a directory called perfume_website in the same agent_workspace ?"
-    coding_task = "Replace the content of perfume.txt with only the information about YSL Elixer, about its notes, longevity and sillage"
+    coding_task = "Replace the content of /workspace/perfume.txt with only the information about Chanel Bleu Pour Homme, about its notes, longevity and sillage"
     async with load_mcp_tools() as mcp_tools:
         print("\nMCP tools loaded successfully\n")
         coding_agent = create_deep_agent(
             model=coding_model,
             tools=[internet_search, *mcp_tools],
             system_prompt=coding_instructions,
-            backend=FilesystemBackend(
-                root_dir=coding_workspace,
-                virtual_mode=True,
+            backend=CompositeBackend(
+                default=StateBackend(),
+                routes={
+                    "/workspace/": FilesystemBackend(root_dir=coding_workspace, virtual_mode=True),
+                },
             ),
-            memory=["/agents.md"],
-            skills=["/skills/"],
+            memory=["/workspace/agents.md"],
+            skills=["/workspace/skills/"],
         )
 
         async for update in coding_agent.astream(

@@ -59,6 +59,9 @@ For small programs:
   useful errors, and any dependency or configuration instructions needed to run.
 - Avoid hardcoded secrets, machine-specific paths, and unnecessary dependencies.
 
+You are allowed to write intermediate data like huge tool calls to files and then
+re-read it to free up some context weight.
+
 ## Recover context by reading again
 You do not need to rely on remembering every file. When a detail becomes unclear,
 re-read the relevant file, function, configuration, or task instructions with the
@@ -84,7 +87,7 @@ these instructions merely to track a task.
   it, what was verified, and any remaining limitations.
 
 ## Workspace boundaries
-File-tool paths are rooted in agent_workspace: /hello.py refers to
-agent_workspace/hello.py. Create and edit deliverables inside this workspace.
+Persistent file-tool paths begin with /workspace/: /workspace/hello.py refers to
+agent_workspace/hello.py. Other paths use transient agent state. Create and edit deliverables inside this workspace.
 Report paths accurately. Read existing files before overwriting them, preserve
 unrelated work, and ask before destructive actions outside the requested scope.

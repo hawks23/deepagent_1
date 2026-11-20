@@ -6,10 +6,10 @@ import os
 from pathlib import Path
 import tempfile
 import unittest
-from unittest.mock import AsyncMock, patch
+from unittest.mock import MagicMock, patch
 
 from deepagents import create_deep_agent
-from deepagents.backends import FilesystemBackend
+from deepagents.backends import FilesystemBackend, CompositeBackend, StateBackend
 from langchain_core.callbacks import AsyncCallbackHandler
 from langchain_core.language_models.fake_chat_models import FakeMessagesListChatModel
 from langchain_core.messages import AIMessage
@@ -31,14 +31,16 @@ class ModelInputRecorder(AsyncCallbackHandler):
 class AgentTests(unittest.IsolatedAsyncioTestCase):
     async def test_entry_point_invokes_and_prints_each_request(self):
         with patch.dict(os.environ, {"TAVILY_API_KEY": "offline-test-key"}):
-            entry = importlib.import_module("agent2")
+            entry = importlib.import_module("agent")
 
         @contextlib.asynccontextmanager
         async def local_tools():
             yield []
 
-        graph = AsyncMock()
-        graph.ainvoke.return_value = {"messages": [AIMessage(content="Ready.")]}
+        graph = MagicMock()
+        async def stream_result(*args, **kwargs):
+            yield {"model": {"messages": [AIMessage(content="Ready.")]}}
+        graph.astream.side_effect = stream_result
         output = io.StringIO()
         with (
             patch.object(entry, "ChatOpenAI"),
@@ -49,14 +51,13 @@ class AgentTests(unittest.IsolatedAsyncioTestCase):
             await entry.main()
             await entry.main()
 
-        self.assertEqual(create_agent.call_args.kwargs["memory"], ["/agents.md"])
-        self.assertEqual(graph.ainvoke.await_count, 2)
-        for call in graph.ainvoke.await_args_list:
-            self.assertEqual(call.args, ({"messages": [{
-                "role": "user",
-                "content": "Create /hello.py with a greet(name: str) -> str function and a simple example that calls it. Explain how the code works and how I can run it.",
-            }]},))
-            self.assertEqual(call.kwargs, {})
+        self.assertEqual(create_agent.call_args.kwargs["memory"], ["/workspace/agents.md"])
+        self.assertEqual(graph.astream.call_count, 2)
+        for call in graph.astream.call_args_list:
+            self.assertEqual(len(call.args[0]["messages"]), 1)
+            self.assertEqual(call.args[0]["messages"][0]["role"], "user")
+            self.assertTrue(call.args[0]["messages"][0]["content"])
+            self.assertEqual(call.kwargs, {"stream_mode": "updates"})
         self.assertEqual(output.getvalue().count("Ready."), 2)
 
     async def test_graph_reads_workspace_file(self):
@@ -70,7 +71,7 @@ class AgentTests(unittest.IsolatedAsyncioTestCase):
             model = ToolModel(responses=[
                 AIMessage(content="", tool_calls=[{
                     "name": "read_file",
-                    "args": {"file_path": "/example.py"},
+                    "args": {"file_path": "/workspace/example.py"},
                     "id": "read-example",
                     "type": "tool_call",
                 }]),
@@ -78,11 +79,14 @@ class AgentTests(unittest.IsolatedAsyncioTestCase):
             ])
             agent = create_deep_agent(
                 model=model,
-                memory=["/agents.md"],
-                backend=FilesystemBackend(root_dir=folder, virtual_mode=True),
+                memory=["/workspace/agents.md"],
+                backend=CompositeBackend(
+                    default=StateBackend(),
+                    routes={"/workspace/": FilesystemBackend(root_dir=folder, virtual_mode=True)},
+                ),
             )
             result = await agent.ainvoke({"messages": [{
-                "role": "user", "content": "Read /example.py",
+                "role": "user", "content": "Read /workspace/example.py",
             }]}, config={"callbacks": [recorder]})
             self.assertTrue(recorder.inputs)
             system_content = recorder.inputs[0][0].content
